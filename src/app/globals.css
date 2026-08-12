@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  /* SAGANANI.PH brand palette */
+  --color-sibol-green: #17281f;
+  --color-butil-gold: #d89b3c;
+  --color-lupang-sunog: #b0512e;
+  --color-bigas-cream: #f5f0e4;
+
+  --background: var(--color-bigas-cream);
+  --foreground: var(--color-sibol-green);
+}
+
+@theme inline {
+  --color-sibol-green: var(--color-sibol-green);
+  --color-butil-gold: var(--color-butil-gold);
+  --color-lupang-sunog: var(--color-lupang-sunog);
+  --color-bigas-cream: var(--color-bigas-cream);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+  --font-tagline: var(--font-newsreader);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Leaflet map container needs an explicit height or it renders collapsed */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Comfortable minimum touch target size for mobile-first data entry */
+.tap-target {
+  min-height: 44px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
