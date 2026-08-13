@@ -20,7 +20,64 @@ guhit) sa itaas-kaliwa. Lalabas ang listahan ng mga pahina.
 
 ---
 
+## Pagbebenta sa Counter (POS) — ito ang gagamitin mo sa tindahan
+
+Ito ang bagong, pinakamabilis na paraan para mag-benta sa counter. Nasa
+pinaka-unahan ito ng menu, sa ilalim ng **"POS (Counter)"**.
+
+1. I-tap ang **"Benta sa Counter"**.
+2. Meron kang dalawang paraan para magdagdag ng produkto sa cart:
+   - **I-tap ang produkto** sa grid (para sa Bigas, Itlog, Dried Fish —
+     mga produktong walang barcode). Lalabas ang numeric keypad, i-type
+     ang dami (pwede ang decimal, hal. "2.5" para sa 2.5 kg), tapos
+     i-tap ang **"Idagdag sa Cart"**.
+   - **I-tap ang "📷 Scan Barcode"** (para sa mga pre-packaged item na
+     may barcode, hal. de lata, chichirya, inumin, kapag na-activate na
+     ito). Ituon lang ang camera sa barcode — awtomatiko itong madadagdag
+     sa cart.
+3. Kapag kumpleto na ang order, i-tap ang berdeng **cart bar** sa ibaba
+   ng screen (nagpapakita ito ng bilang ng item at total presyo).
+4. Sa Cart, pwede mong baguhin ang quantity (+ / − o i-type direkta) o
+   alisin ang isang item.
+5. I-tap ang **"Mag-Checkout"**.
+6. Piliin ang **Payment Method** (Cash/GCash/COD), piliin ang customer
+   kung kilala (o iwanang blangko para sa walk-in), tapos i-tap ang
+   **"Kumpletuhin ang Benta"**.
+7. Makikita mo ang resibo sa screen. Awtomatiko na itong nakalog sa
+   Sales Log at nabawasan na rin ang Inventory — wala ka nang ibang
+   gagawin.
+
+**Tip:** Kung hindi nakilala ng scanner ang barcode (bagong produkto pa
+ito), lalabas ang opsyon na i-link ito sa existing na produkto o gumawa
+ng bagong produkto — sundin lang ang mga button sa screen.
+
+## Pagtanggap ng Bagong Paninda (Restock)
+
+Gamitin ito pagbalik galing palengke o pagdating ng delivery ng supplier
+— mas mabilis ito kaysa sa buong Purchases Log form.
+
+1. I-tap ang **"Restock"** sa menu (nasa ilalim din ng "POS (Counter)").
+2. I-tap ang produkto o mag-scan ng barcode.
+3. I-type ang **dami na natanggap** at ang **presyo na binayaran**
+   (awtomatikong may nakalagay na dati ayon sa huling presyo, pwede
+   palitan). Piliin ang supplier kung alam.
+4. I-tap ang **"Idagdag"** — mauulit ito para sa lahat ng produktong
+   natanggap sa parehong biyahe.
+5. Kapag tapos na, i-tap ang berdeng bar sa ibaba, tapos ang
+   **"Kumpletuhin ang Restock"**.
+6. Piliin kung **"Planned"** (hindi pa bayad) o **"Paid"** (bayad na),
+   tapos i-save.
+
+Awtomatiko na itong nakalog sa Purchases Log at nadagdagan na rin ang
+Inventory.
+
+---
+
 ## 1. Paano Mag-log ng Benta (Sales)
+
+_(Gamitin ang paraang ito para sa online order, delivery, o kung gusto
+mong mag-log ng benta na hindi galing sa POS counter. Para sa walk-in
+sale sa tindahan, mas mabilis ang "Pagbebenta sa Counter (POS)" sa itaas.)_
 
 Gamitin ito tuwing may nabibiling customer, online man o walk-in.
 

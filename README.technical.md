@@ -116,6 +116,11 @@ against your new project, in order:
 2. Open `supabase/migrations/0001_init.sql` from this repo, copy its full
    contents, paste into a new query, and click **Run**.
 3. Do the same for `supabase/migrations/0002_seed.sql`.
+4. Do the same for `supabase/migrations/0003_pos.sql` (adds the Barcode
+   field used by the POS screens — see Section 14).
+
+If your project already exists and you're only adding the POS feature,
+you only need to run `0003_pos.sql` — 0001 and 0002 already applied.
 
 **Option B — Supabase CLI** (if you prefer scripting this / want it
 repeatable for a staging project later):
@@ -157,7 +162,7 @@ through Supabase's auth admin API), so use the provided script:
 **Adding a 3rd staff login later:** add one more row to the `USERS` array
 in `scripts/create-users.mjs` and re-run the same command. No schema change,
 no redeploy needed. The new person automatically gets full access, same as
-the first two (there's no role system yet — see Section 9 if you want to
+the first two (there's no role system yet — see Section 12 if you want to
 add restricted roles later).
 
 You can also create/manage users anytime from the Supabase dashboard under
@@ -263,7 +268,7 @@ logo file:
 
 | Excel tab | Database table(s) / view |
 |---|---|
-| Pricing | `products` (joined to `categories`). `retail_price`, `margin_amount`, `margin_pct`, `suki_margin_pct` are database-computed (generated) columns — edit `unit_cost`, `markup_pct`, or `suki_price` and the rest recalculates automatically. |
+| Pricing | `products` (joined to `categories`). `retail_price`, `margin_amount`, `margin_pct`, `suki_margin_pct` are database-computed (generated) columns — edit `unit_cost`, `markup_pct`, or `suki_price` and the rest recalculates automatically. Also holds the nullable `barcode` field used by POS (Section 14). |
 | Suppliers | `suppliers` |
 | Purchases Log | `purchases` — `total_cost` is auto-computed from `qty × unit_cost` |
 | Sales Log | `sales` — `total_sale` is auto-computed from `qty × unit_price`; extended with `customers`, delivery location, and an order-status pipeline the Excel version didn't have |
@@ -275,7 +280,9 @@ logo file:
 
 New tables with no Excel equivalent: `customers` (with delivery lat/lng),
 `inquiries` (lead log), `compliance_items` (permit tracker), `profiles`
-(one row per login).
+(one row per login). The POS Sell/Restock screens (Section 14) are a new
+UI layer only — they write into the existing `sales`/`purchases` tables,
+not new tables.
 
 ---
 
@@ -289,7 +296,7 @@ full access).
 To add **role-restricted** access later without a rebuild:
 
 1. Add a `role text default 'staff'` column to `profiles` (e.g. via a new
-   migration file `0003_add_roles.sql`).
+   migration file `0004_add_roles.sql`).
 2. Replace the blanket `using (true)` policies on the tables you want to
    restrict with policies that check `(select role from profiles where id
    = auth.uid())`.
@@ -322,7 +329,55 @@ Pricing Master page as normal — no code change needed.
 
 ---
 
-## 14. Known limitations / intentional simplifications (Day 1)
+## 14. Point-of-Sale (Sell + Restock) and barcode scanning
+
+Two mobile-first screens live under **POS (Counter)** in the sidebar:
+
+- **`/pos/sell`** — the store counter checkout. Tap products in a category
+  grid, or scan a barcode with the phone's camera. Adds a cart, then on
+  Checkout writes one row per cart line straight into the same `sales`
+  table the Sales Log module uses (`order_source = 'In-store'`,
+  `order_status = 'Completed'`). Inventory and the P&L update automatically
+  because both are computed live from that table — there's no separate
+  deduction logic to keep in sync.
+- **`/pos/restock`** — for logging stock received (palengke trips, supplier
+  deliveries). Same scan/select flow, queues items with qty + unit cost +
+  optional supplier, then saves the batch straight into the same
+  `purchases` table the Purchases Log module uses.
+
+**Barcode scanning**: uses the `html5-qrcode` npm package, which reads the
+phone's camera through the browser's own `getUserMedia` API — **no paid
+service, no API key, no extra hardware**. It only works over HTTPS (Vercel
+deployments are HTTPS by default, so this is automatic) and the browser
+will prompt for camera permission the first time. Loose/weighed products
+(Bigas, Itlog, Dried Fish) have no barcode and simply stay on the
+tap-to-select grid — that's expected, not a gap.
+
+**Adding barcodes to products**: edit the product in Pricing Master and
+fill in the **Barcode** field (nullable, must be unique). Scanning an
+unrecognized barcode in either POS screen offers linking it to an existing
+product on the spot, or a pre-filled shortcut to create a new one.
+
+**Device-agnostic by design**: the POS screens are regular pages behind
+the same Supabase Auth login as the rest of the app — no local install, no
+device pairing. Any phone or tablet can open the URL, log in with either
+account, and start selling immediately; switching devices mid-shift loses
+nothing because nothing is tied to a specific browser except the
+in-progress cart/restock queue (see below).
+
+**Offline**: intentionally not built. The store's internet was confirmed
+reliable, so both screens write directly to Supabase on every action — no
+local queue to get out of sync.
+
+**Surviving a refresh**: the in-progress cart (Sell) and restock queue
+(Restock) are saved to that browser's `localStorage` as you go, so an
+accidental refresh on the *same device* recovers them. This is a
+convenience for that one browser tab, not a sync mechanism — it will not
+appear if you switch to a different phone.
+
+---
+
+## 15. Known limitations / intentional simplifications (Day 1)
 
 - No role-based permissions yet (see Section 12 for how to add them).
 - No automated backups on the Supabase free tier (see Section 9).
@@ -331,3 +386,5 @@ Pricing Master page as normal — no code change needed.
 - Cash Flow / Balance Sheet use the same simplified "cash basis" assumption
   as the original Excel model, not full accrual accounting.
 - The logo is a placeholder — see Section 10.
+- POS cart/restock-queue recovery after a refresh is per-device
+  (`localStorage`), not synced across devices — see Section 14.
