@@ -6,6 +6,13 @@ import { createClient } from "@/lib/supabase/server";
 
 export type ProductFormState = { error?: string };
 
+function friendlyError(message: string) {
+  if (message.includes("products_barcode_unique")) {
+    return "May ibang produkto nang gumagamit ng barcode na ito.";
+  }
+  return message;
+}
+
 function parseProductForm(formData: FormData) {
   const suki_price = formData.get("suki_price");
   return {
@@ -17,6 +24,7 @@ function parseProductForm(formData: FormData) {
     suki_price: suki_price ? Number(suki_price) : null,
     low_stock_threshold: Number(formData.get("low_stock_threshold") || 0),
     is_active: formData.get("is_active") === "on",
+    barcode: String(formData.get("barcode") || "").trim() || null,
     notes: String(formData.get("notes") || "").trim() || null,
   };
 }
@@ -29,7 +37,7 @@ export async function createProduct(_prevState: ProductFormState, formData: Form
 
   const supabase = await createClient();
   const { error } = await supabase.from("products").insert(values);
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyError(error.message) };
 
   revalidatePath("/pricing");
   redirect("/pricing");
@@ -47,7 +55,7 @@ export async function updateProduct(
 
   const supabase = await createClient();
   const { error } = await supabase.from("products").update(values).eq("id", id);
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyError(error.message) };
 
   revalidatePath("/pricing");
   redirect("/pricing");
@@ -57,4 +65,13 @@ export async function toggleProductActive(id: string, nextActive: boolean) {
   const supabase = await createClient();
   await supabase.from("products").update({ is_active: nextActive }).eq("id", id);
   revalidatePath("/pricing");
+}
+
+export async function linkBarcodeToProduct(productId: string, barcode: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("products").update({ barcode }).eq("id", productId);
+  if (error) throw new Error(friendlyError(error.message));
+  revalidatePath("/pricing");
+  revalidatePath("/pos/sell");
+  revalidatePath("/pos/restock");
 }

@@ -3,6 +3,13 @@ export type NavGroup = { title: string; items: NavItem[] };
 
 export const NAV_GROUPS: NavGroup[] = [
   {
+    title: "POS (Counter)",
+    items: [
+      { href: "/pos/sell", label: "Benta sa Counter", icon: "🛍️" },
+      { href: "/pos/restock", label: "Restock", icon: "📥" },
+    ],
+  },
+  {
     title: "Araw-araw",
     items: [
       { href: "/", label: "Dashboard", icon: "🏠" },

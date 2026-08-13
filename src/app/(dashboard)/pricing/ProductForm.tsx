@@ -16,16 +16,19 @@ type Product = {
   suki_price: number | null;
   low_stock_threshold: number;
   is_active: boolean;
+  barcode: string | null;
   notes: string | null;
 };
 
 export function ProductForm({
   categories,
   product,
+  defaultBarcode,
   action,
 }: {
   categories: Category[];
   product?: Product;
+  defaultBarcode?: string;
   action: (state: ProductFormState, formData: FormData) => Promise<ProductFormState>;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
@@ -104,6 +107,20 @@ export function ProductForm({
             step="0.01"
             min="0"
             defaultValue={product?.low_stock_threshold ?? 0}
+          />
+        </Field>
+
+        <Field
+          label="Barcode"
+          htmlFor="barcode"
+          hint="Para lang sa pre-packaged items (UPC/EAN). Iwanang blangko ang loose/timbangin na produkto."
+        >
+          <Input
+            id="barcode"
+            name="barcode"
+            inputMode="numeric"
+            defaultValue={product?.barcode ?? defaultBarcode ?? ""}
+            placeholder="e.g. 4800016151234"
           />
         </Field>
 

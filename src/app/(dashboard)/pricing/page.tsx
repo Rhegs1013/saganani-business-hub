@@ -9,7 +9,7 @@ export default async function PricingPage() {
   const { data: products } = await supabase
     .from("products")
     .select(
-      "id, name, unit, unit_cost, markup_pct, retail_price, margin_amount, margin_pct, suki_price, suki_margin_pct, is_active, categories(name, is_active)",
+      "id, name, unit, unit_cost, markup_pct, retail_price, margin_amount, margin_pct, suki_price, suki_margin_pct, is_active, barcode, categories(name, is_active)",
     )
     .order("name");
 
@@ -44,6 +44,7 @@ export default async function PricingPage() {
                   <thead>
                     <tr className="border-b border-sibol-green/10 text-left text-sibol-green/60">
                       <th className="px-4 py-3 font-bold">Produkto</th>
+                      <th className="px-4 py-3 font-bold">Barcode</th>
                       <th className="px-4 py-3 font-bold">Unit</th>
                       <th className="px-4 py-3 font-bold">Unit Cost</th>
                       <th className="px-4 py-3 font-bold">Markup %</th>
@@ -59,6 +60,7 @@ export default async function PricingPage() {
                     {items!.map((p) => (
                       <tr key={p.id} className="border-b border-sibol-green/5 last:border-0">
                         <td className="px-4 py-3 font-bold">{p.name}</td>
+                        <td className="px-4 py-3 font-mono text-xs">{p.barcode ?? "—"}</td>
                         <td className="px-4 py-3">{p.unit}</td>
                         <td className="px-4 py-3">{formatPeso(p.unit_cost)}</td>
                         <td className="px-4 py-3">{p.markup_pct}%</td>
