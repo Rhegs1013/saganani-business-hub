@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Saganani Business Hub — Project Instructions
 # SAVE THIS FILE AS: ./CLAUDE.md (or ./.claude/CLAUDE.md) at the repo root
 # This loads ALONGSIDE ~/.claude/CLAUDE.md — it does not replace it. Be more
