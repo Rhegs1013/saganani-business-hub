@@ -1,0 +1,19 @@
+{
+  "_comment": "Adjust the Bash patterns once you confirm your exact Supabase/Vercel CLI commands.",
+  "permissions": {
+    "ask": [
+      "Bash(git push *)",
+      "Bash(rm -rf *)",
+      "Bash(supabase db push *)",
+      "Bash(supabase migration *)",
+      "Bash(supabase db reset *)",
+      "Bash(vercel --prod *)",
+      "Bash(vercel deploy --prod *)",
+      "Bash(vercel env *)"
+    ],
+    "deny": [
+      "Bash(git push * --force*)",
+      "Bash(git push * -f *)"
+    ]
+  }
+}
