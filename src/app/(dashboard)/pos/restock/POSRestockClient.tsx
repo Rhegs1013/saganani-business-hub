@@ -77,6 +77,14 @@ export function POSRestockClient({
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  // Prefetch the scanner library in the background as soon as this screen
+  // is open, so tapping "Scan Barcode" later doesn't wait on a network
+  // fetch - iOS Safari can drop the camera-permission user gesture if
+  // getUserMedia is requested too long after the tap.
+  useEffect(() => {
+    import("@/components/BarcodeScanner");
+  }, []);
+
   useEffect(() => {
     if (!hydrated) return;
     window.localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,11 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Saganani Business Hub",
   description: "SAGANANI.PH — Sagana sa Bahay, Sagana sa Buhay",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

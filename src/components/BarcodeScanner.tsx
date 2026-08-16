@@ -21,28 +21,52 @@ export function BarcodeScanner({
   useEffect(() => {
     let cancelled = false;
 
-    import("html5-qrcode").then(({ Html5Qrcode }) => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      // One-time device-capability check on mount, not a render-loop risk,
+      // so the setState-in-effect rule is intentionally bypassed here.
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
+      setError(
+        "Hindi supported ng browser na ito ang pag-access sa camera. Subukan sa Chrome o Safari, at siguraduhing HTTPS ang link.",
+      );
+      return;
+    }
+
+    const config = { fps: 10, qrbox: { width: 260, height: 160 } };
+    const onDecoded = (decodedText: string) => {
+      if (handledRef.current) return;
+      handledRef.current = true;
+      scannerRef.current?.stop().catch(() => {});
+      onScan(decodedText.trim());
+    };
+    const onFrame = () => {
+      // per-frame "no code found" - expected constantly, ignore
+    };
+
+    import("html5-qrcode").then(async ({ Html5Qrcode }) => {
       if (cancelled) return;
       const scanner = new Html5Qrcode(regionId, { verbose: false });
       scannerRef.current = scanner;
 
-      scanner
-        .start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 260, height: 160 } },
-          (decodedText) => {
-            if (handledRef.current) return;
-            handledRef.current = true;
-            scanner.stop().catch(() => {});
-            onScan(decodedText.trim());
-          },
-          () => {
-            // per-frame "no code found" - expected constantly, ignore
-          },
-        )
-        .catch(() => {
+      // Some mobile browsers/webviews mis-handle a bare `facingMode`
+      // constraint and throw instead of falling back gracefully, so we
+      // retry against an explicitly-enumerated back camera before giving up.
+      try {
+        await scanner.start({ facingMode: "environment" }, config, onDecoded, onFrame);
+        return;
+      } catch {
+        // fall through to camera enumeration below
+      }
+
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cancelled || cameras.length === 0) throw new Error("no-camera");
+        const backCamera = cameras.find((c) => /back|rear|environment/i.test(c.label)) ?? cameras[cameras.length - 1];
+        await scanner.start(backCamera.id, config, onDecoded, onFrame);
+      } catch {
+        if (!cancelled) {
           setError("Hindi ma-access ang camera. Payagan ang camera access sa browser settings.");
-        });
+        }
+      }
     });
 
     return () => {
