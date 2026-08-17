@@ -8,18 +8,20 @@ import { DeleteLiabilityButton } from "./DeleteLiabilityButton";
 export default async function BalanceSheetPage() {
   const supabase = await createClient();
 
-  const [{ data: cashPosition }, { data: inventoryRows }, { data: liabilities }, { data: settings }] =
+  const [{ data: cashPosition }, { data: inventoryRows }, { data: liabilities }, { data: settings }, { data: taxPayable }] =
     await Promise.all([
       supabase.from("monthly_cash_position").select("*").order("month_start", { ascending: false }).limit(1),
       supabase.from("inventory_status").select("ending_value"),
       supabase.from("liabilities").select("*").order("as_of_date", { ascending: false }),
       supabase.from("balance_sheet_settings").select("*").eq("id", 1).single(),
+      supabase.from("percentage_tax_payable_status").select("*").single(),
     ]);
 
   const cash = cashPosition?.[0]?.cash_balance ?? settings?.starting_cash ?? 0;
   const inventoryValue = (inventoryRows ?? []).reduce((sum, r) => sum + (r.ending_value ?? 0), 0);
   const totalAssets = cash + inventoryValue;
-  const totalLiabilities = (liabilities ?? []).reduce((sum, l) => sum + l.amount, 0);
+  const percentageTaxPayable = taxPayable?.payable_balance ?? 0;
+  const totalLiabilities = (liabilities ?? []).reduce((sum, l) => sum + l.amount, 0) + percentageTaxPayable;
   const equity = totalAssets - totalLiabilities;
 
   return (
@@ -54,6 +56,18 @@ export default async function BalanceSheetPage() {
 
         <Card className="p-5">
           <h2 className="mb-4 font-extrabold text-sibol-green">Liabilities</h2>
+
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-sibol-green/5 px-3 py-2.5 text-sm">
+            <div>
+              <p className="font-bold text-sibol-green">Percentage Tax Payable</p>
+              <p className="text-xs text-sibol-green/50">
+                Awtomatikong kinakalkula (3% ng revenue, minus binayaran na sa BIR due dates) — hindi ito
+                mano-manong ine-edit.
+              </p>
+            </div>
+            <p className="font-extrabold text-sibol-green">{formatPeso(percentageTaxPayable)}</p>
+          </div>
+
           {!liabilities || liabilities.length === 0 ? (
             <p className="text-sm text-sibol-green/60">Walang naka-log na liability.</p>
           ) : (
