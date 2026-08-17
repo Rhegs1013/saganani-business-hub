@@ -65,6 +65,12 @@ export default async function MonthlyPnlPage() {
             kinakalkula ito batay sa buong-taon na net taxable income — magkaiba ito sa buwan-buwanang
             Percentage Tax na ipinapakita sa itaas.
           </p>
+          <p className="mt-2 text-xs text-sibol-green/50">
+            Ang &ldquo;Percentage Tax (3%)&rdquo; sa taas ay buwan-buwanang estimate lang — ang aktwal na
+            pagbabayad sa BIR (Form 2551Q) ay tuwing quarterly: Apr 25, Jul 25, Oct 25, at Jan 25. Makikita
+            ang running na utang na ito sa Balance Sheet bilang &ldquo;Percentage Tax Payable&rdquo;, at
+            lumalabas lang ito bilang cash outflow sa Cash Flow pag-abot ng aktwal na due date.
+          </p>
         </>
       )}
     </div>
